@@ -184,11 +184,20 @@ function parseOBJ(text) {
         Object.entries(geometry.data).filter(([, array]) => array.length > 0));
   }
 
+  onParseEnd();
+
   return {
     geometries,
     materialLibs,
   };
 }
+
+
+function onParseEnd() {
+  const element = document.getElementById("loading");
+  element.remove();
+}
+
 
 async function main() {
 
