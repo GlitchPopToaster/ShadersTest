@@ -341,12 +341,12 @@ async function main() {
     highp vec4 texture2 = texture2D(u_texture2, vTextureCoord);
 
     vec3 normal = v_normal;
-    float diffuseLight = max(dot(normal, u_lightDirection * 2.5 ), 0.0) * (mathfPingPong(u_time, 1.8) + 1.2);
+    float diffuseLight = max(dot(normal, u_lightDirection), -0.4) * (mathfPingPong(u_time, 0.9) + 0.7);
 
-    vec3 u_lightColor = vec3(1.0, 0.80, 0.55);
-    vec3 diffuse = texture.rgb * diffuseLight * u_lightColor * texture2.xyz;
+    vec3 u_lightColor = vec3(1.0, 0.8, 0.5);
+    vec3 diffuse = diffuseLight * u_lightColor * texture2.xyz;
 
-    gl_FragColor =  vec4(texture.rgb *0.4 + diffuse, texture.a) * v_color;
+    gl_FragColor =  vec4(texture.rgb  + diffuse, texture.a) * v_color;
   }
   
   `;
