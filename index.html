@@ -1,0 +1,181 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>MyWebGLDemo</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"
+            integrity="sha512-zhHQR0/H5SEBL3Wn6yYSaTTZej12z0hVZKOv3TwCUXT1z5qeqGcXJLLrbERYRScEDDpYIJhPC1fk31gqR783iQ=="
+            crossorigin="anonymous"
+            defer></script>
+    <script src="js/script.js" type="module"></script>
+    <script src="js/twgl-full.min.js"></script>
+
+    <script id="vertex-shader2" type="x-shader/x-vertex">
+        uniform highp float u_time;
+        uniform highp float u_threshold; // The threshold value for the dissolve effect
+        
+        attribute vec4 aVertexPosition;
+        attribute vec3 aVertexNormal;
+        attribute vec2 aTextureCoord;
+        
+        uniform mat4 uNormalMatrix;
+        uniform mat4 uModelViewMatrix;
+        uniform mat4 uProjectionMatrix;
+        
+        varying highp vec2 vTextureCoord;
+        varying highp vec3 vVertexPosition;
+        varying highp vec3 vLighting;
+        
+        varying highp vec3 world_pos;
+        
+        void main(void) {
+        
+            gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+            world_pos = gl_Position.xyz;
+        
+            vTextureCoord = aTextureCoord;
+            vVertexPosition = aVertexPosition.xyz;
+        
+            // Apply lighting effect
+        
+            highp vec3 ambientLight = vec3(0.2, 0.2, 0.2);
+            highp vec3 directionalLightColor = vec3(1, 1, 1);
+            highp vec3 directionalVector = normalize(vec3(0.85, 0.8, 0.75));
+        
+            highp vec4 transformedNormal = uNormalMatrix * vec4(aVertexNormal, 1.0);
+        
+            highp float directional = max(dot(transformedNormal.xyz, directionalVector), 0.0);
+            vLighting = ambientLight + (directionalLightColor * directional);
+        }
+    </script>
+    <script id="fragment-shader2" type="x-shader/x-fragment">
+
+    uniform highp float u_time;
+    uniform highp float u_threshold; // The threshold value for the dissolve effect
+
+    uniform sampler2D u_texture; // The texture to be dissolved
+    uniform sampler2D u_noise; // The noise map for the dissolve effect
+    uniform sampler2D blendTexture;
+    
+    highp vec2 UV = vec2(1., 1.);
+
+    highp vec3 offset = vec3(0.);
+
+    bool up = true;
+
+    highp vec4 borderColor = vec4(0.9, 0.3, 0.2, 1.);
+    highp float borderHeight = 0.2;
+    highp float waveAmplitude = 1.0;
+    highp float waveFrequency = 1.0;
+    highp float wavePhase = 0.1;
+    highp float emissionIntensity = 1.0;
+    highp float noiseSpeed = 0.1;
+    highp float noiseInfluence = 1.0;
+
+    highp vec2 blendUVScale = vec2(1.);
+    highp vec2 noiseUVScale = vec2(1.);
+    highp vec2 textureUVScale = vec2(1.);
+
+    const highp float tao = 2. * 3.14;
+
+    varying highp vec3 world_pos;
+
+    varying highp vec3 vLighting;
+    varying highp vec2 vTextureCoord; // The texture coordinate
+
+    
+highp float radius = 5.;
+
+
+    void main() {
+
+        highp vec3 position = world_pos;
+
+        highp vec4 text = texture2D(u_texture, vTextureCoord);
+        highp vec4 blend = texture2D(blendTexture, vTextureCoord * blendUVScale);
+        
+        highp vec2 st = vTextureCoord;
+        st.y -= u_time * noiseSpeed * 100.0;
+        highp vec4 noise = texture2D(u_noise , st * noiseUVScale);
+
+        highp float global_distance = distance(position, offset) - u_threshold;
+        global_distance += (noise.r * noiseInfluence);
+        highp float border1 = global_distance > radius ? 5. : 0.;
+        highp float border2 = global_distance > (radius + borderHeight) ? 1. : 0.2;
+
+        //highp vec4 color = mix(blend, borderColor, border1);
+        //highp vec4 df = blend * vec4(1.0, 0.1, 0.1, 0.0);
+        //color = color + 5.0 * pow(df, vec4(4.0, 4.0, 4.0, 4.0));
+        //color.xyz -= blend.xyz*0.5;
+        //color = mix(color, text, border2);
+        //gl_FragColor = vec4(color.rgb * vLighting, color.a);
+
+        highp vec4 color;
+        blend = vec4(blend.xyz * vLighting, blend.a);
+        text = vec4(text.xyz * vLighting, text.a);
+        color = mix(blend, borderColor * vec4(0.4 + vLighting * 0.4, 0.0), border1) ;
+        highp vec4 df = blend * vec4(1.0, 0.0, 0.0, 1.0);
+        color = color + 5.0 * pow(df, vec4(3.0, 3.0, 3.0, 3.0));
+        color.xyz -= blend.xyz * 0.6;
+        color = mix(color, text, border2);
+        color.xyz -= blend.xyz * 0.2;
+
+        gl_FragColor = color;
+    }
+    </script>
+
+
+    <script id="skybox-vertex-shader" type="x-shader/x-vertex">
+        attribute vec4 aVertexPosition;
+        varying vec4 v_position;
+
+        uniform highp float u_time;
+        uniform highp float u_threshold; // The threshold value for the dissolve effect
+
+        void main() {
+          //v_position = aVertexPosition;
+          //gl_Position = aVertexPosition;
+          v_position = aVertexPosition + u_time * u_threshold;
+          gl_Position = aVertexPosition + u_time * u_threshold;
+          gl_Position.z = 1.0;
+        }
+    </script>
+    
+    <script id="skybox-fragment-shader" type="x-shader/x-fragment">
+        precision mediump float;
+     
+        uniform samplerCube u_skybox;
+        uniform mat4 u_viewDirectionProjectionInverse;
+        
+        varying vec4 v_position;
+
+        void main() {
+          vec4 t = u_viewDirectionProjectionInverse * v_position;
+          gl_FragColor = textureCube(u_skybox, normalize(t.xyz / t.w));
+          //vec4 color = vec4(0.5, 0.5, 0.5, 0.5);
+          //gl_FragColor = color;
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="center">
+            <h1>MyWebGLDemo <a href="/index2.html">Next>></a></h1>
+
+            <div class="slidecontainer">
+                <input type="range" min="0" max="100" value="50" class="slider" id="myRange">
+                <p id="rangeValue">100</p>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+
+
+        <div class="center">
+            <canvas id="webglCanvas" width="1280" height="920"></canvas>
+        </div>
+    </div>
+</body>
+</html>
