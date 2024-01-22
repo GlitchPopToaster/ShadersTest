@@ -51,3 +51,52 @@ h1 {
     background: #40d2ff;
     cursor: pointer;
   }
+
+
+  .butR{
+    float: right;
+  }
+  
+  .butL{
+    float: left;
+  }
+
+a.button {
+  background-color: #196ea3;
+  border: none;
+  color: rgb(206, 223, 247);
+  padding: 10px 15px !important;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 25px;
+  font-weight: 600;
+  margin: -10px 25px 2px 25px;
+  cursor: pointer;
+}
+a.button:hover {
+  background-color: #2f9dc9;
+  border: none;
+  color: rgb(206, 223, 247);
+  padding: 10px 15px !important;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 25px;
+  font-weight: 600;
+  margin: -1px 25px 2px 25px;
+  cursor: pointer;
+}
+a.button:active {
+  background-color: #40c7df;
+  border: none;
+  color: rgb(206, 223, 247);
+  padding: 10px 15px !important;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 25px;
+  font-weight: 600;
+  margin: -10px 25px 2px 25px;
+  cursor: pointer;
+}
