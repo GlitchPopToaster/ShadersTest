@@ -4,7 +4,6 @@
 var gl;
 
 var threshold = 0.0;
-//var m4 = twgl.m4;
 
 
 window.onload = function init() {
@@ -12,7 +11,6 @@ window.onload = function init() {
   /** @type {HTMLCanvasElement} */
   
   var canvas = document.getElementById("webglCanvas");
-  //gl = WebGLUtils.setupWebGL(canvas);
 
   gl = canvas.getContext("webgl2", {
     alpha: true, 
@@ -24,7 +22,6 @@ window.onload = function init() {
     powerPreference: "default",
     desynchronized: false});
  
-  //webglUtils.resizeCanvasToMatchDisplaySize(canvas);
 
   if (!gl) {
       alert("WebGL is not available");
@@ -35,26 +32,7 @@ window.onload = function init() {
 
 
 function main() {
-/*
-    const canvas = document.getElementById("webglCanvas");
-
-    gl = WebGLUtils.setupWebGL(canvas);
-
-    // Get the WebGL rendering context
-    gl = canvas.getContext("webgl2", {
-        alpha: true, 
-        antialias: true, 
-        depth: true, 
-        stencil: true, 
-        premultipliedAlpha: true,
-        failIfMajorPerformanceCaveat: false,
-        powerPreference: "default",
-        desynchronized: false});
-    if (!gl) {
-      return;
-    }
-*/
-    
+   
   
     var vert_sh = getShaderFromScript(gl, "skybox-vertex-shader");
     var frag_sh = getShaderFromScript(gl, "skybox-fragment-shader");
@@ -87,6 +65,7 @@ function main() {
   
     gl.activeTexture(gl.TEXTURE1);
     const texture_noise = loadTexture(gl, "craters5.png");
+    gl.bindTexture(gl.TEXTURE_2D, texture_noise);
 
     // Create a texture.
     gl.activeTexture(gl.TEXTURE0);
@@ -236,14 +215,6 @@ function main() {
   
 
 
-
-    
-
-
-
-
-
-
       // Tell it to use our program (pair of shaders)
       gl.useProgram(program);
       // Bind the attribute/buffer set we want.
@@ -286,8 +257,6 @@ function main() {
       gl.drawArrays(gl.TRIANGLES, 0, 1 * 6);
 
 
-
-
       
 
       // Compute the projection matrix
@@ -296,9 +265,6 @@ function main() {
       // Make a view matrix from the camera matrix.
       var viewMatrix2 = m4.inverse(cameraMatrix2);
       var viewProjectionMatrix = m4.multiply(projectionMatrix2, viewMatrix2);
-      // Our uniforms. In this case we only have one, "u_matrix" which we'll see below
-      var uniforms = {
-      };
 
 
 

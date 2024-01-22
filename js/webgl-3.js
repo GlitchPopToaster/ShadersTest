@@ -1,12 +1,8 @@
-
 "use strict";
-
-
 
 var gl;
 var canvas
 var threshold = 0.0;
-
 
 window.onload = function init() {
   // Get A WebGL context
@@ -23,8 +19,6 @@ window.onload = function init() {
     failIfMajorPerformanceCaveat: false,
     powerPreference: "default",
     desynchronized: false});
- 
-  //webglUtils.resizeCanvasToMatchDisplaySize(canvas);
 
   if (!gl) {
       alert("WebGL is not available");
@@ -200,71 +194,6 @@ async function main() {
 
   const vs = `
   precision highp float;
-  attribute vec4 a_position;
-  attribute vec3 a_normal;
-  attribute vec4 a_color;
-  attribute vec2 a_texcoord;
-  //attribute vec2 aTextureCoord;
-
-  uniform mat4 u_projection;
-  uniform mat4 u_view;
-  uniform mat4 u_world;
-
-  varying vec3 v_normal;
-  varying vec4 v_color;
-  varying highp vec2 vTextureCoord;
-  
-  varying vec4 FragPos;  
-
-  void main() {
-    gl_Position = u_projection * u_view * u_world * a_position;
-    
-    FragPos = u_world * a_position;
-    v_normal = a_normal;
-    v_color = a_color;
-
-    vTextureCoord = a_texcoord;
-  }
-  `;
-
-  const fs = `
-
-  precision highp float;
-
-  uniform sampler2D u_texture;
-  uniform sampler2D u_texture2;
-
-  varying vec3 v_normal;
-  varying vec4 v_color;
-  varying highp vec2 vTextureCoord;
-
-  varying vec4 FragPos;  
-
-  uniform vec4 u_diffuse;
-  uniform vec3 u_lightDirection;
-
-
-  void main () {
-    
-    highp vec4 texture = texture2D(u_texture, vTextureCoord);
-    highp vec4 texture2 = texture2D(u_texture2, vTextureCoord);
-
-    vec3 normal = normalize(v_normal);
-    vec3 lightPos = vec3(0.0, 0.0, 0.0);
-    vec3 lightDir = normalize((lightPos - FragPos.xyz));
-    float diffuseLight = max(dot(normal, lightDir), 0.0);
-
-    vec3 u_lightColor = vec3(1.0, 0.8, 0.5);
-    vec3 diffuse = diffuseLight * u_lightColor;
-
-    gl_FragColor =  vec4(texture.rgb + diffuse, texture.a) * v_color;
-  }
-  `;
-
-
-
-  const vs2 = `
-  precision highp float;
 
   uniform float u_time;
 
@@ -314,7 +243,7 @@ async function main() {
   }
   `;
 
-  const fs2 = `
+  const fs = `
   precision highp float;
 
   uniform float u_time;
@@ -353,7 +282,7 @@ async function main() {
 
 
   // compiles and links the shaders, looks up attribute and uniform locations
-  const meshProgramInfo = webglUtils.createProgramInfo(gl, [vs2, fs2]);
+  const meshProgramInfo = webglUtils.createProgramInfo(gl, [vs, fs]);
 
   const response = await fetch('./3dmodels/grass1.obj');  
   const text = await response.text();
