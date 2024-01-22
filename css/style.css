@@ -60,6 +60,9 @@ h1 {
   .butL{
     float: left;
   }
+  .head1{
+    width: 650px;
+  }
 
 a.button {
   background-color: #196ea3;
