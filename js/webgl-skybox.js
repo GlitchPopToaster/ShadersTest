@@ -87,7 +87,6 @@ function main() {
   
     gl.activeTexture(gl.TEXTURE1);
     const texture_noise = loadTexture(gl, "craters5.png");
-    gl.bindTexture(gl.TEXTURE_2D, texture_noise);
 
     // Create a texture.
     gl.activeTexture(gl.TEXTURE0);

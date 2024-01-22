@@ -185,15 +185,14 @@
 
         void main() {
 
-        //some vetrex displacement
-        vec3 newPosition = a_position.xyz + a_normal;
+        //some vetrex displacement NO
+        //vec3 newPosition = a_position.xyz;
         //vec3 newPosition = a_position.xyz + a_normal * addpos * noise((u_time + (a_position.x + a_position.y)));
-        gl_Position = u_matrix * u_world * vec4( newPosition, 1.0 );
+        //gl_Position = u_matrix * u_world * vec4( newPosition, 1.0 );
         //some vetrex displacement end
 
-
           // Multiply the position by the matrix.
-          //gl_Position = u_matrix * a_position;
+          gl_Position = u_matrix * u_world * a_position;
         
           // Pass the color to the fragment shader.
           v_color = a_color;
@@ -230,7 +229,7 @@
             vec3 direction = reflect(eyeToSurfaceDir,worldNormal);
             //vec3 direction = reflect(eyeToSurfaceDir,worldNormal) / (1.01 + eyeToSurfaceDir);
 
-            vec4 fragColor = textureCube(u_texture, direction) * 5.0 + vec4(0.11, 0.05, 0.1, 0.0);
+            vec4 fragColor = textureCube(u_texture, direction) * 2.0 + vec4(0.11, 0.05, 0.1, 0.0);
             //gl_FragColor = mix(v_color * u_colorMult, fragColor, 0.9);
             //gl_FragColor = v_color * u_colorMult * fragColor;
             gl_FragColor = mix(fragColor, v_color * u_colorMult, clamp(pow((v_color.x - 0.15), 5.0), 0.0, 1.0));
@@ -245,8 +244,8 @@
         <div class="center">
             <h1><a href="/index.html">&lt;&lt;Back</a> MyWebGLDemo2 <a href="/index3.html">Next>></a></h1>
             <div class="slidecontainer">
-                <input type="range" min="0" max="100" value="50" class="slider" id="myRange">
-                <p id="rangeValue">100</p>
+                <input type="range" min="0" max="100" value="50" class="slider" id="myRange" style="opacity: 0%;">
+                <p id="rangeValue" style="opacity: 0%;">100</p>
             </div>
         </div>
     </div>
